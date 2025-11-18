@@ -1,0 +1,91 @@
+========================================
+STATIC BUILD INSTRUCTIONS FOR WINDOWS
+========================================
+
+Prerequisites:
+✓ CMake 3.14+
+✓ MinGW-w64 (g++)
+✓ PowerShell
+
+========================================
+BUILD STEPS
+========================================
+
+1. Copy the entire 'abc-setlist-gui' folder to your Windows filesystem
+   (Example: C:\Users\YourName\Projects\abc-setlist-gui)
+
+2. Open PowerShell
+
+3. Navigate to the project:
+   cd C:\path\to\abc-setlist-gui
+
+4. Run the static build script:
+   .\build-static-windows.bat
+
+5. Wait for build to complete (2-5 minutes first time)
+
+========================================
+OUTPUT LOCATION
+========================================
+
+After successful build, your static executable will be at:
+   build\abc-setlist-gui.exe
+
+This is a STATIC executable - no DLLs needed!
+
+========================================
+VERIFY STATIC LINKING
+========================================
+
+To verify it's truly static, check the file size:
+   dir build\abc-setlist-gui.exe
+
+Static build: ~2-5 MB
+Dynamic build: <1 MB (would need DLLs)
+
+========================================
+TEST THE EXECUTABLE
+========================================
+
+Run from PowerShell:
+   .\build\abc-setlist-gui.exe
+
+Or double-click in File Explorer:
+   build\abc-setlist-gui.exe
+
+========================================
+DISTRIBUTION
+========================================
+
+To distribute your application:
+1. Copy ONLY the abc-setlist-gui.exe file
+2. Share it with anyone running Windows 7+
+3. No installation or DLLs required!
+
+========================================
+TROUBLESHOOTING
+========================================
+
+Error: "cmake not found"
+Solution: Add CMake to PATH, restart PowerShell
+
+Error: "g++ not found"
+Solution: Add MinGW bin to PATH, restart PowerShell
+          Verify with: where.exe g++
+
+Error: "cannot find source file Duration.cpp"
+Solution: Make sure 'examples' folder is in parent directory
+
+Error: Build fails with missing libraries
+Solution: First build downloads GLFW and ImGui
+          Check internet connection
+
+========================================
+CLEAN BUILD
+========================================
+
+To start fresh:
+   rmdir /s build
+   .\build-static-windows.bat
+
+========================================

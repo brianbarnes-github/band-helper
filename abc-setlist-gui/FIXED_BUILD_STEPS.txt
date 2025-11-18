@@ -1,0 +1,79 @@
+========================================
+FIXED BUILD STEPS - STATIC WINDOWS BUILD
+========================================
+
+ISSUE FIXED: CMake archive extraction error with FetchContent
+SOLUTION: Use local dependencies instead of online download during CMake
+
+========================================
+UPDATED BUILD PROCESS
+========================================
+
+The build-static-windows.bat script has been updated to:
+1. First download dependencies locally (avoids CMake extraction issues)
+2. Use local deps folder instead of FetchContent
+3. Build with static linking enabled
+
+========================================
+HOW TO BUILD (PowerShell on Windows)
+========================================
+
+1. Navigate to project directory:
+   cd D:\Development\band-helper\abc-setlist-gui
+
+2. Clean any failed build (if needed):
+   rmdir /s build
+   rmdir /s deps
+
+3. Run the updated build script:
+   .\build-static-windows.bat
+
+4. The script will now:
+   ✓ Download GLFW and ImGui to deps\ folder using curl + tar
+   ✓ Configure CMake to use local dependencies
+   ✓ Build with static linking enabled
+   ✓ Create build\abc-setlist-gui.exe
+
+========================================
+WHAT CHANGED
+========================================
+
+Before: CMake FetchContent downloaded and extracted during configuration
+        → Failed with "archive_write_finish_entry" error on Windows
+
+After:  setup-dependencies.bat downloads and extracts FIRST using native Windows tools
+        → CMake just uses the already-extracted deps\ folder
+        → No extraction errors!
+
+========================================
+MANUAL ALTERNATIVE (if script has issues)
+========================================
+
+Step 1: Download dependencies manually
+   .\setup-dependencies.bat
+
+Step 2: Build with CMake
+   mkdir build
+   cd build
+   cmake -G "MinGW Makefiles" .. -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DUSE_LOCAL_DEPS=ON
+   mingw32-make -j4
+
+Step 3: Your executable is at:
+   build\abc-setlist-gui.exe
+
+========================================
+VERIFICATION
+========================================
+
+After successful build:
+
+Check file exists:
+   dir build\abc-setlist-gui.exe
+
+Check file size (should be 2-5 MB for static build):
+   dir build\abc-setlist-gui.exe
+
+Run the executable:
+   .\build\abc-setlist-gui.exe
+
+========================================

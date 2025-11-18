@@ -5,6 +5,21 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Enable static linking
+option(BUILD_STATIC "Build static executable" ON)
+
+if(BUILD_STATIC)
+    # Force static linking on Windows
+    if(WIN32)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
+    endif()
+
+    # Force static linking on Linux
+    if(UNIX AND NOT APPLE)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+    endif()
+endif()
+
 # Add compiler warnings
 if(MSVC)
     add_compile_options(/W4)
@@ -22,11 +37,13 @@ option(USE_LOCAL_DEPS "Use locally downloaded dependencies" ON)
 if(USE_LOCAL_DEPS AND EXISTS "${PROJECT_SOURCE_DIR}/deps")
     message(STATUS "Using local dependencies from deps/")
 
-    # GLFW from local
+    # GLFW from local - build as static library
     set(GLFW_DIR "${PROJECT_SOURCE_DIR}/deps/glfw-3.3.8")
     set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_SHARED_LIBRARY OFF CACHE BOOL "" FORCE)
     add_subdirectory(${GLFW_DIR} ${CMAKE_BINARY_DIR}/glfw)
 
     # ImGui from local
@@ -52,7 +69,7 @@ else()
     message(STATUS "Downloading dependencies via FetchContent...")
     include(FetchContent)
 
-    # GLFW
+    # GLFW - build as static library
     FetchContent_Declare(
         glfw
         URL https://github.com/glfw/glfw/releases/download/3.3.8/glfw-3.3.8.zip
@@ -61,6 +78,8 @@ else()
     set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_SHARED_LIBRARY OFF CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(glfw)
 
     # Dear ImGui
