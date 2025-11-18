@@ -1,0 +1,138 @@
+cmake_minimum_required(VERSION 3.14)
+project(AbcSetlistGUI VERSION 1.0.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Add compiler warnings
+if(MSVC)
+    add_compile_options(/W4)
+else()
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# Include directories
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/../examples/show-time-calculator/include)
+
+# Use local dependencies if available
+option(USE_LOCAL_DEPS "Use locally downloaded dependencies" ON)
+
+if(USE_LOCAL_DEPS AND EXISTS "${PROJECT_SOURCE_DIR}/deps")
+    message(STATUS "Using local dependencies from deps/")
+
+    # GLFW from local
+    set(GLFW_DIR "${PROJECT_SOURCE_DIR}/deps/glfw-3.3.8")
+    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    add_subdirectory(${GLFW_DIR} ${CMAKE_BINARY_DIR}/glfw)
+
+    # ImGui from local
+    set(IMGUI_DIR "${PROJECT_SOURCE_DIR}/deps/imgui-1.90.1")
+
+    # ImGui sources
+    set(IMGUI_SOURCES
+        ${IMGUI_DIR}/imgui.cpp
+        ${IMGUI_DIR}/imgui_demo.cpp
+        ${IMGUI_DIR}/imgui_draw.cpp
+        ${IMGUI_DIR}/imgui_tables.cpp
+        ${IMGUI_DIR}/imgui_widgets.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+    )
+
+    # Include ImGui headers
+    include_directories(${IMGUI_DIR})
+    include_directories(${IMGUI_DIR}/backends)
+
+else()
+    # Fallback to FetchContent
+    message(STATUS "Downloading dependencies via FetchContent...")
+    include(FetchContent)
+
+    # GLFW
+    FetchContent_Declare(
+        glfw
+        URL https://github.com/glfw/glfw/releases/download/3.3.8/glfw-3.3.8.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(glfw)
+
+    # Dear ImGui
+    FetchContent_Declare(
+        imgui
+        URL https://github.com/ocornut/imgui/archive/refs/tags/v1.90.1.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    FetchContent_MakeAvailable(imgui)
+
+    # ImGui sources
+    set(IMGUI_SOURCES
+        ${imgui_SOURCE_DIR}/imgui.cpp
+        ${imgui_SOURCE_DIR}/imgui_demo.cpp
+        ${imgui_SOURCE_DIR}/imgui_draw.cpp
+        ${imgui_SOURCE_DIR}/imgui_tables.cpp
+        ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    )
+
+    # Include ImGui headers
+    include_directories(${imgui_SOURCE_DIR})
+    include_directories(${imgui_SOURCE_DIR}/backends)
+endif()
+
+# Source files from show-time-calculator (reused)
+set(SHARED_SOURCES
+    ../examples/show-time-calculator/src/domain/Duration.cpp
+    ../examples/show-time-calculator/src/domain/AbcSong.cpp
+    ../examples/show-time-calculator/src/services/AbcParser.cpp
+    ../examples/show-time-calculator/src/infrastructure/FileAbcRepository.cpp
+)
+
+# GUI application sources
+set(GUI_SOURCES
+    src/main.cpp
+    src/SetlistManager.cpp
+)
+
+# Main executable
+add_executable(abc-setlist-gui
+    ${GUI_SOURCES}
+    ${SHARED_SOURCES}
+    ${IMGUI_SOURCES}
+)
+
+# Link libraries
+target_link_libraries(abc-setlist-gui
+    glfw
+)
+
+# Link OpenGL
+if(WIN32)
+    target_link_libraries(abc-setlist-gui opengl32)
+elseif(APPLE)
+    target_link_libraries(abc-setlist-gui "-framework OpenGL")
+else()
+    target_link_libraries(abc-setlist-gui GL)
+endif()
+
+# Link filesystem library for GCC < 9
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+    target_link_libraries(abc-setlist-gui stdc++fs)
+endif()
+
+# Windows-specific: Set subsystem to Windows (not console)
+if(WIN32)
+    # For release builds, hide console window
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        set_target_properties(abc-setlist-gui PROPERTIES
+            WIN32_EXECUTABLE TRUE
+        )
+    endif()
+endif()
