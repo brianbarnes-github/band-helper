@@ -1,0 +1,3 @@
+[submodule "examples/show-time-calculator"]
+	path = examples/show-time-calculator
+	url = https://github.com/brianbarnes-github/show-time-calculator.git
