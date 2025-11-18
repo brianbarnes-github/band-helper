@@ -33,6 +33,22 @@ The application features:
 - Export controls with numbering toggle
 - Real-time feedback messages
 
+## Installation
+
+### Windows - Pre-built Executable (Recommended)
+
+For Windows users who want to skip the build process:
+
+1. Download `band-helper.zip` from the [`windows-executable`](windows-executable/) folder in this repository
+2. Extract the zip file to a location of your choice
+3. Run `abc-setlist-gui.exe`
+
+No additional dependencies or installation required - the executable is statically built with all dependencies included.
+
+### Building from Source
+
+If you prefer to build from source or need to build for other platforms, follow the instructions below.
+
 ## Building the Project
 
 ### Prerequisites
