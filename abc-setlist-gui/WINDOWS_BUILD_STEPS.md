@@ -57,26 +57,36 @@ Before starting, you need:
 
 ## Step 2: Access Your Project Files from Windows
 
-Your WSL files are accessible from Windows at this path:
+**IMPORTANT:** You need BOTH directories:
+- `abc-setlist-gui` (the GUI application)
+- `examples/show-time-calculator` (shared source code)
+
+Your WSL files are accessible from Windows at:
 
 ```
-\\wsl$\Ubuntu\home\brian\band-helper\abc-setlist-gui
+\\wsl$\Ubuntu\home\brian\band-helper\
+```
+
+Expected structure:
+```
+band-helper\
+  ├── abc-setlist-gui\      (GUI app - navigate here to build)
+  └── examples\
+      └── show-time-calculator\  (shared code - required for build)
 ```
 
 **Two ways to access:**
 
 ### Method 1: File Explorer
 1. Open File Explorer
-2. In the address bar, type: `\\wsl$\Ubuntu\home\brian\band-helper\abc-setlist-gui`
+2. In the address bar, type: `\\wsl$\Ubuntu\home\brian\band-helper`
 3. Press Enter
-4. You should see your project files
+4. You should see both `abc-setlist-gui` and `examples` folders
 
-### Method 2: Map as Network Drive (Optional)
-1. In File Explorer, right-click "This PC"
-2. Click "Map network drive"
-3. Choose a drive letter (e.g., Z:)
-4. Enter path: `\\wsl$\Ubuntu\home\brian\band-helper\abc-setlist-gui`
-5. Now you can access as `Z:\`
+### Method 2: Copy to Windows (Alternative)
+1. Copy the entire `band-helper` folder to your Windows drive
+2. Example: `C:\Users\YourName\Projects\band-helper\`
+3. Easier for repeated builds, faster compilation
 
 ## Step 3: Build the Static Executable
 
@@ -87,43 +97,55 @@ Your WSL files are accessible from Windows at this path:
    - Type: `cmd`
    - Press Enter
 
-2. **Navigate to your project**:
+2. **Navigate to the abc-setlist-gui directory**:
    ```cmd
    cd \\wsl$\Ubuntu\home\brian\band-helper\abc-setlist-gui
    ```
 
+   Or if you copied to Windows:
+   ```cmd
+   cd C:\Users\YourName\Projects\band-helper\abc-setlist-gui
+   ```
+
 3. **Run the build script**:
    ```cmd
-   build-static-windows.bat
+   .\build-static-windows.bat
    ```
 
 4. **Wait for build to complete**:
-   - Script will check for tools
-   - Download dependencies via CMake (first time only)
-   - Compile all source files
-   - Create static executable
+   - Script checks for CMake and compiler
+   - Downloads GLFW and ImGui to deps\ folder (first time only)
+   - Configures CMake with static linking enabled
+   - Compiles all source files (GUI + show-time-calculator)
+   - Creates standalone executable
 
 ### Manual Build (Alternative)
 
-If you prefer to build manually:
+If you prefer to build manually, first download dependencies:
+
+```cmd
+.\setup-dependencies.bat
+```
+
+Then build:
 
 **For MinGW:**
 ```cmd
-cd \\wsl$\Ubuntu\home\brian\band-helper\abc-setlist-gui
+cd C:\path\to\band-helper\abc-setlist-gui
 rmdir /s /q build
 mkdir build
 cd build
-cmake -G "MinGW Makefiles" .. -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release
-cmake --build .
+cmake -G "MinGW Makefiles" .. -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DUSE_LOCAL_DEPS=ON
+mingw32-make
 ```
 
 **For Visual Studio** (from "x64 Native Tools Command Prompt for VS"):
 ```cmd
-cd \\wsl$\Ubuntu\home\brian\band-helper\abc-setlist-gui
+cd C:\path\to\band-helper\abc-setlist-gui
 rmdir /s /q build
 mkdir build
 cd build
-cmake .. -DBUILD_STATIC=ON
+cmake .. -DBUILD_STATIC=ON -DUSE_LOCAL_DEPS=ON
 cmake --build . --config Release
 ```
 

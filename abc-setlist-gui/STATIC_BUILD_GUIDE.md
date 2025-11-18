@@ -64,32 +64,48 @@ This creates a Windows .exe that can run without DLL files.
 **Prerequisites:**
 - MinGW-w64 installed (recommended) OR Visual Studio
 - CMake 3.14+
+- **Important:** Both `abc-setlist-gui` and `examples` folders required
 
-**Step 2a: Using MinGW-w64 on Windows**
+**Step 1: Use the Automated Build Script (Easiest)**
+
+The simplest way is to use the provided build script:
+
+```cmd
+cd C:\path\to\band-helper\abc-setlist-gui
+.\build-static-windows.bat
+```
+
+This script automatically:
+- Downloads GLFW and ImGui dependencies
+- Configures CMake with static linking
+- Builds the executable
+- Shows the output location
+
+**Step 2a: Manual Build with MinGW-w64 on Windows**
 
 Open Windows Command Prompt or PowerShell:
 
 ```cmd
-cd \\wsl$\Ubuntu\home\brian\band-helper\abc-setlist-gui
+cd C:\path\to\band-helper\abc-setlist-gui
 rmdir /s /q build
 mkdir build
 cd build
-cmake -G "MinGW Makefiles" .. -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release
-cmake --build .
+cmake -G "MinGW Makefiles" .. -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DUSE_LOCAL_DEPS=ON
+mingw32-make
 ```
 
 The static executable will be at: `build\abc-setlist-gui.exe`
 
-**Step 2b: Using Visual Studio (MSVC) on Windows**
+**Step 2b: Manual Build with Visual Studio (MSVC) on Windows**
 
 Open "x64 Native Tools Command Prompt for VS":
 
 ```cmd
-cd \\wsl$\Ubuntu\home\brian\band-helper\abc-setlist-gui
+cd C:\path\to\band-helper\abc-setlist-gui
 rmdir /s /q build
 mkdir build
 cd build
-cmake .. -DBUILD_STATIC=ON
+cmake .. -DBUILD_STATIC=ON -DUSE_LOCAL_DEPS=ON
 cmake --build . --config Release
 ```
 

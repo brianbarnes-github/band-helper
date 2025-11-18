@@ -4,25 +4,34 @@ STATIC BUILD INSTRUCTIONS FOR WINDOWS
 
 Prerequisites:
 ✓ CMake 3.14+
-✓ MinGW-w64 (g++)
-✓ PowerShell
+✓ MinGW-w64 (g++) OR Visual Studio with C++ tools
+✓ PowerShell or Command Prompt
+✓ Internet connection (for downloading dependencies on first build)
 
 ========================================
 BUILD STEPS
 ========================================
 
-1. Copy the entire 'abc-setlist-gui' folder to your Windows filesystem
-   (Example: C:\Users\YourName\Projects\abc-setlist-gui)
+1. Copy the entire project to your Windows filesystem
+   - Include both 'abc-setlist-gui' folder AND 'examples' folder
+   - Example location: C:\Users\YourName\Projects\band-helper\
+   - Structure should be:
+     band-helper\
+       ├── abc-setlist-gui\
+       └── examples\
+           └── show-time-calculator\
 
-2. Open PowerShell
+2. Open PowerShell or Command Prompt
 
-3. Navigate to the project:
-   cd C:\path\to\abc-setlist-gui
+3. Navigate to the abc-setlist-gui directory:
+   cd C:\path\to\band-helper\abc-setlist-gui
 
 4. Run the static build script:
    .\build-static-windows.bat
 
 5. Wait for build to complete (2-5 minutes first time)
+   - First build downloads GLFW and ImGui libraries
+   - Subsequent builds are much faster
 
 ========================================
 OUTPUT LOCATION
